@@ -7,17 +7,18 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.LinkedList;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
-import lat.pam.recyclerviewproject.databinding.FragmentFirstBinding;
+import java.util.LinkedList;
 
 public class FirstFragment extends Fragment {
 
-    private FragmentFirstBinding binding;
     private RecyclerView mRecyclerView;
     private WordListAdapter mAdapter;
 
@@ -26,34 +27,43 @@ public class FirstFragment extends Fragment {
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
-
-        binding = FragmentFirstBinding.inflate(inflater, container, false);
-        return binding.getRoot();
-
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_first, container, false);
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         final LinkedList<String> mWordList = new LinkedList<>();
         // Put initial data into the word list.
         for (int i = 0; i < 20; i++) {
             mWordList.addLast("Word " + i);
         }
+
         // Get a handle to the RecyclerView.
         mRecyclerView = view.findViewById(R.id.recyclerview);
-// Create an adapter and supply the data to be displayed.
+
+        // Create an adapter and supply the data to be displayed.
         mAdapter = new WordListAdapter(this, mWordList);
-// Connect the adapter with the RecyclerView.
+
+        // Connect the adapter with the RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
-// Give the RecyclerView a default layout manager.
+
+        // Give the RecyclerView a default layout manager.
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        FloatingActionButton fab = view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int wordListSize = mWordList.size();
+                // Add a new word to the wordList.
+                mWordList.addLast("+ Word " + wordListSize);
+                // Notify the adapter, that the data has changed.
+                mRecyclerView.getAdapter().notifyItemInserted(wordListSize);
+                // Scroll to the bottom.
+                mRecyclerView.smoothScrollToPosition(wordListSize);
+            }
+        });
     }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
-    }
-
 }
